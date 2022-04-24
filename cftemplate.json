@@ -1,0 +1,86 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "SecurityGroupssh": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+          "GroupDescription": "security group",
+          "VpcId": {
+            "Ref": "VPCName"
+          },
+          "SecurityGroupIngress": [
+            {
+              "IpProtocol": "tcp",
+              "FromPort": 22,
+              "ToPort": 22,
+              "CidrIp": "0.0.0.0/0"
+            }
+          ],
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "AWS::StackName"
+            },
+            {
+              "Key": "Application",
+              "Value": "ApplicationName"
+            },
+            {
+              "Key": "AppID",
+              "Value": "AppID"
+            }
+          ]
+        }
+      },
+      "SecurityGrouprdp": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+          "GroupDescription": "security group",
+          "VpcId": {
+            "Ref": "VPCName"
+          },
+          "SecurityGroupIngress": [
+            {
+              "IpProtocol": "tcp",
+              "FromPort": 3389,
+              "ToPort": 3389,
+              "CidrIp": "0.0.0.0/0"
+            }
+          ],
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "AWS::StackName"
+            },
+            {
+              "Key": "Application",
+              "Value": "ApplicationName"
+            },
+            {
+              "Key": "AppID",
+              "Value": "AppID"
+            }
+          ]
+        }
+      }
+    },
+    "Parameters": {
+      "VPCName": {
+        "Type": "String"
+      },
+      "AppID": {
+        "Type": "String"
+      },
+      "ApplicationName": {
+        "Type": "String"
+      }
+    },
+    "Outputs": {
+      "SecurityGrouprdp": {
+        "Value": "https://console.aws.amazon.com/ec2/home?region=${AWS::Region}#/view/${SecurityGrouprdp}"
+      },
+      "SecurityGroupssh": {
+        "Value": "https://console.aws.amazon.com/ec2/home?region=${AWS::Region}#/view/${SecurityGroupssh}"
+      }
+    }
+  }
