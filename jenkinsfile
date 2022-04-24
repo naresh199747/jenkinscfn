@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    stages{
+    stages {
         stage('clone repo')  {
             steps  {
           sh "export AWS_DEFAULT_REGION=us-east-1"
