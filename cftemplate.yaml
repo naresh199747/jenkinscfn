@@ -1,0 +1,238 @@
+Resources:
+######################VPC, Subnets######################################
+  VPC:
+   Type: AWS::EC2::VPC
+   Properties:
+     CidrBlock: 10.0.0.0/16
+     EnableDnsHostnames: true
+     EnableDnsSupport: true
+     InstanceTenancy: default
+     Tags:
+       - Key: Name
+         Value: !Sub ${AWS::StackName}-vpc
+  PublicSubnet1:
+   Type: AWS::EC2::Subnet
+   Properties:
+     MapPublicIpOnLaunch: true
+     CidrBlock: 10.0.0.0/19
+     VpcId:
+       Ref: VPC
+     AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}PublicSubnet1
+  PublicSubnet1RouteTable:
+   Type: AWS::EC2::RouteTable
+   Properties:
+     VpcId:
+       Ref: VPC
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}PublicSubnet1  
+  PublicSubnet1RouteTableAssociation:
+   Type: AWS::EC2::SubnetRouteTableAssociation
+   Properties:
+     RouteTableId:
+       Ref: PublicSubnet1RouteTable
+     SubnetId:
+       Ref: PublicSubnet1
+  PublicSubnet1DefaultRoute:
+   Type: AWS::EC2::Route
+   Properties:
+     RouteTableId:
+       Ref: PublicSubnet1RouteTable
+     DestinationCidrBlock: 0.0.0.0/0
+     GatewayId:
+       Ref: IGW
+  ElasticIPs1:
+   Type: AWS::EC2::EIP
+   Properties:
+     Domain: vpc
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}eip-PrivateSubnet1
+  PublicSubnet1NATGateway:
+   Type: AWS::EC2::NatGateway
+   Properties:
+     AllocationId:
+       Fn::GetAtt:
+         - ElasticIPs1
+         - AllocationId
+     SubnetId:
+       Ref: PublicSubnet1
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}-PrivateSubnet1
+  PublicSubnet2:
+   Type: AWS::EC2::Subnet
+   Properties:
+     CidrBlock: 10.0.32.0/19
+     VpcId:
+       Ref: VPC
+     AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+     MapPublicIpOnLaunch: true
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}PublicSubnet2
+  PublicSubnet2RouteTable:
+   Type: AWS::EC2::RouteTable
+   Properties:
+     VpcId:
+       Ref: VPC
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}PublicSubnet2
+  PublicSubnet2RouteTableAssociation:
+   Type: AWS::EC2::SubnetRouteTableAssociation
+   Properties:
+     RouteTableId:
+       Ref: PublicSubnet2RouteTable
+     SubnetId:
+       Ref: PublicSubnet2
+  PublicSubnet2DefaultRoute:
+   Type: AWS::EC2::Route
+   Properties:
+     RouteTableId:
+       Ref: PublicSubnet2RouteTable
+     DestinationCidrBlock: 0.0.0.0/0
+     GatewayId:
+       Ref: IGW
+  ElasticIPs2:
+   Type: AWS::EC2::EIP
+   Properties:
+     Domain: vpc
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}eip-PrivateSubnet2
+  PublicSubnet2NATGateway:
+   Type: AWS::EC2::NatGateway
+   Properties:
+     AllocationId:
+       Fn::GetAtt:
+         - ElasticIPs2
+         - AllocationId
+     SubnetId:
+       Ref: PublicSubnet2
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}-PrivateSubnet2
+  PrivateSubnet1:
+   Type: AWS::EC2::Subnet
+   Properties:
+     CidrBlock: 10.0.96.0/19
+     VpcId:
+       Ref: VPC
+     AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+     MapPublicIpOnLaunch: false
+     Tags:
+       - Key: aws-cdk:subnet-name
+         Value: Private
+       - Key: aws-cdk:subnet-type
+         Value: Private
+       - Key: Name
+         Value: !Sub ${AWS::StackName}PrivateSubnet1
+  PrivateSubnet1RouteTable:
+   Type: AWS::EC2::RouteTable
+   Properties:
+     VpcId:
+       Ref: VPC
+     Tags:
+       - Key: Name
+         Value: !Sub ${AWS::StackName}PrivateSubnet1
+  PrivateSubnet1RouteTableAssociation:
+   Type: AWS::EC2::SubnetRouteTableAssociation
+   Properties:
+     RouteTableId:
+       Ref:   PrivateSubnet1RouteTable
+     SubnetId:
+       Ref: PrivateSubnet1
+  PrivateSubnet1DefaultRoute:
+   Type: AWS::EC2::Route
+   Properties:
+     RouteTableId:
+       Ref:   PrivateSubnet1RouteTable
+     DestinationCidrBlock: 0.0.0.0/0
+     NatGatewayId:
+       Ref: PublicSubnet1NATGateway
+  PrivateSubnet2:
+   Type: AWS::EC2::Subnet
+   Properties:
+     CidrBlock: 10.0.128.0/19
+     VpcId:
+       Ref: VPC
+     AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+     MapPublicIpOnLaunch: false
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}PrivateSubnet2
+  PrivateSubnet2RouteTable:
+   Type: AWS::EC2::RouteTable
+   Properties:
+     VpcId:
+       Ref: VPC
+     Tags:
+       - Key: Name
+         Value:  !Sub ${AWS::StackName}PrivateSubnet2
+   Metadata:
+     aws:cdk:path:  !Sub ${AWS::StackName}PrivateSubnet2/RouteTable
+  PrivateSubnet2RouteTableAssociation:
+   Type: AWS::EC2::SubnetRouteTableAssociation
+   Properties:
+     RouteTableId:
+       Ref: PrivateSubnet2RouteTable
+     SubnetId:
+       Ref: PrivateSubnet2
+  PrivateSubnet2DefaultRoute3:
+   Type: AWS::EC2::Route
+   Properties:
+     RouteTableId:
+       Ref: PrivateSubnet2RouteTable
+     DestinationCidrBlock: 0.0.0.0/0
+     NatGatewayId:
+       Ref: PublicSubnet2NATGateway
+  IGW:
+   Type: AWS::EC2::InternetGateway
+   Properties:
+     Tags:
+       - Key: Name
+         Value: !Sub ${AWS::StackName}-inw
+  VPCGW:
+   Type: AWS::EC2::VPCGatewayAttachment
+   Properties:
+     VpcId:
+       Ref: VPC
+     InternetGatewayId:
+       Ref: IGW
+######################BastionHost Instance######################################
+  BastionInstancesSecurityGroup:
+   Type: AWS::EC2::SecurityGroup
+   Properties:
+     GroupDescription: Allow ssh access to ec2 instances
+     SecurityGroupEgress:
+       - CidrIp: 0.0.0.0/0
+         Description: Allow all outbound traffic by default
+         IpProtocol: "-1"
+     SecurityGroupIngress:
+       - CidrIp: 0.0.0.0/0
+         Description: allow ssh access from the world
+         FromPort: 22
+         IpProtocol: tcp
+         ToPort: 22
+     VpcId:
+       Ref: VPC
+  BastionInstance:
+   Type: AWS::EC2::Instance
+   Properties:
+     AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+     ImageId: ami-08d4ac5b634553e16
+     InstanceType: t3.nano
+     KeyName: Tv2zpreprod
+     SecurityGroupIds:
+       - Fn::GetAtt:
+           - BastionInstancesSecurityGroup
+           - GroupId
+     SubnetId:
+       Ref: PublicSubnet1
+     Tags:
+       - Key: Name
+         Value: !Sub ${AWS::StackName}-Bastion Instance
