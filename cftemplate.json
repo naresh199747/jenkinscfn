@@ -6,7 +6,7 @@
         "Properties": {
           "GroupDescription": "security group",
           "VpcId": {
-            "Ref": "VPCName"
+            "Ref": "vpc-5114ca2c"
           },
           "SecurityGroupIngress": [
             {
@@ -20,14 +20,6 @@
             {
               "Key": "Name",
               "Value": "AWS::StackName"
-            },
-            {
-              "Key": "Application",
-              "Value": "ApplicationName"
-            },
-            {
-              "Key": "AppID",
-              "Value": "AppID"
             }
           ]
         }
@@ -37,7 +29,7 @@
         "Properties": {
           "GroupDescription": "security group",
           "VpcId": {
-            "Ref": "VPCName"
+            "Ref": "vpc-5114ca2c"
           },
           "SecurityGroupIngress": [
             {
@@ -51,30 +43,12 @@
             {
               "Key": "Name",
               "Value": "AWS::StackName"
-            },
-            {
-              "Key": "Application",
-              "Value": "ApplicationName"
-            },
-            {
-              "Key": "AppID",
-              "Value": "AppID"
             }
           ]
         }
       }
     },
-    "Parameters": {
-      "VPCName": {
-        "Type": "String"
-      },
-      "AppID": {
-        "Type": "String"
-      },
-      "ApplicationName": {
-        "Type": "String"
-      }
-    },
+   
     "Outputs": {
       "SecurityGrouprdp": {
         "Value": "https://console.aws.amazon.com/ec2/home?region=${AWS::Region}#/view/${SecurityGrouprdp}"
